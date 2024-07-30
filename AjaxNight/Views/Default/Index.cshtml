@@ -1,0 +1,110 @@
+﻿﻿@{
+    ViewData["Title"] = "Index";
+}
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+<h3 class="alert alert-primary">Ajax Ürün İşlemleri</h3>
+
+<button id="btnlist" class="btn btn-outline-primary">Ürün Listesi</button>
+<button id="btncreate" class="btn btn-outline-info">Ürün Ekle</button>
+<button id="btndelete" class="btn btn-outline-danger">Ürün Sil</button>
+<button id="btnupdate" class="btn btn-outline-success">Ürün Güncelle</button>
+<button id="btnget" class="btn btn-outline-warning">Ürün Getir</button>
+
+<hr />
+
+<div class="alert alert-dark">Ürün Listesi</div>
+
+<div id="productlist">
+</div>
+
+<hr />
+
+<div class="alert alert-success">Yeni Ürün Girişi</div>
+<div>
+    <input type="text" placeholder="Ürün Adını Giriniz" id="productname" class="form-control" />
+    <br />
+    <input type="text" placeholder="Ürün Stok Sayısını Giriniz" id="productstock" class="form-control" />
+    <br />
+    <input type="text" placeholder="Ürün Fiyatını Giriniz" id="productprice" class="form-control" />
+    <br />
+</div>
+
+<hr />
+
+<div class="alert alert-success">Ürün Silme Ekranı</div>
+<div>
+    <input type="text" placeholder="Silinecek Ürün Id Değerini Giriniz" id="productdeletedid" class="form-control" />
+    <br />
+</div>
+
+<script>
+
+    $("#btnlist").click(function () {
+        $.ajax({
+            contentType: "application/json",
+            dataType: "json",
+            type: "Get",
+            url: "/Default/ProductList/",
+            success: function (funk1) {
+                let products = jQuery.parseJSON(funk1);
+                console.log(products);
+
+                let tablehtml = "<table class=table table-bordered>"
+                    + "<tr>"
+                    + "<th>Ürün Id</th>"
+                    + "<th>Ürün Adı</th>"
+                    + "<th>Ürün Fiyat</th>"
+                    + "<th>Ürün Stok</th>"
+                    + "</tr>"
+                $.each(products, (index, value) => {
+                    tablehtml += `<tr>`
+                        + `<td>${value.ProductId}</td>`
+                        + `<td>${value.ProductName}</td>`
+                        + `<td>${value.Price}</td>`
+                        + `<td>${value.Stock}</td>`
+                        + `</tr>`
+                });
+                tablehtml += "</table>";
+                $("#productlist").html(tablehtml);
+            }
+        });
+    });
+
+    $("#btncreate").click(function () {
+        let productvalues = {
+            ProductName: $("#productname").val(),
+            Stock: $("#productstock").val(),
+            Price: $("#productprice").val()
+        };
+
+        $.ajax({
+            type: "post",
+            url: "/Default/CreateProduct/",
+            data: productvalues,
+            success: function (funk2) {
+                let result = jQuery.parseJSON(funk2);
+                swal("Tebrikler!", "Ürün Başarıyla Eklendi", "success");
+            }
+        });
+    });
+
+    $("#btndelete").click(function () {
+        let id = $("#productdeletedid").val();
+        $.ajax({
+            url: "/Default/DeleteProduct/" + id,
+            type: "post",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (funk3) {
+                swal("Ürün Başarıyla Silindi");
+            }
+        });
+    });
+
+</script>
